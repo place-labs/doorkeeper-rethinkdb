@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.files = Dir["lib/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
   s.test_files = Dir["spec/**/*"]
 
-  s.add_dependency "doorkeeper", ">= 4.0.0", "< 5"
+  s.add_dependency "doorkeeper", ">= 4.0.0", "< 6"
   s.add_dependency "nobrainer", ">= 0.33.0", "< 1"
 
   s.add_development_dependency "sqlite3", '~> 0'
