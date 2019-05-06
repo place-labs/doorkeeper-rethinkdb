@@ -9,7 +9,7 @@ module Doorkeeper
     include Models::Accessible
     include Models::Scopes
 
-    include ::Doorkeeper::Couchbase::Timestamps
+    include ::Doorkeeper::Rethinkdb::Timestamps
 
     attr_writer :use_refresh_token
 

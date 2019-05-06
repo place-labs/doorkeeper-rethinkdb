@@ -1,6 +1,6 @@
 module Doorkeeper
   module Orm
-    module Couchbase
+    module Rethinkdb
       def self.initialize_models!
         require 'support/orm/rethinkdb/timestamps'
         require 'support/orm/rethinkdb/access_grant'
