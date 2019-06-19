@@ -11,21 +11,21 @@ module Doorkeeper
       end
 
       def revoked_at
-        revoked = self[:revoked_at]
+        revoked = super
         Time.at(revoked) unless revoked.nil?
       end
 
       def revoked_at=(time)
         if time
           number = time.is_a?(Numeric) ? time.to_i : time.to_time.to_i
-          self[:revoked_at] = number
+          super number
         else
-          self[:revoked_at] = nil
+          super nil
         end
       end
 
       def created_at
-        Time.at(self[:created_at])
+        Time.at(super)
       end
     end
   end
