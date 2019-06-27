@@ -56,12 +56,7 @@ module Doorkeeper
       #   if there is no record with such refresh token
       #
       def by_refresh_token(refresh_token)
-        tok = self.find_by_refresh_token(refresh_token)
-        return tok if tok
-
-        # legacy - required for existing systems
-        id = AccessToken.bucket.get("refresh-#{refresh_token}", quiet: true)
-        find_by_id(id) if id
+        where(refresh_token: refresh_token).first
       end
 
       # Revokes AccessToken records that have not been revoked and associated
@@ -252,7 +247,7 @@ module Doorkeeper
       end
 
       generator = Doorkeeper.configuration.access_token_generator.constantize
-      self.id = self.token = generator.generate(
+      self.token = generator.generate(
         resource_owner_id: resource_owner_id,
         scopes: scopes,
         application: application,
