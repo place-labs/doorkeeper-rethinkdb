@@ -9,7 +9,7 @@ module Doorkeeper
     include Models::Accessible
     include Models::Scopes
 
-    include ::Doorkeeper::Rethinkdb::Timestamps
+    include Timestamps
 
     belongs_to  :application, class_name: 'Doorkeeper::Application'
 

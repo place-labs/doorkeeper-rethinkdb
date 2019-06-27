@@ -23,6 +23,9 @@ module Doorkeeper
     field :expires_in,              type: Integer
     field :ttl,                     type: Integer
 
+    alias :plaintext_token :token
+    alias :plaintext_refresh_token :refresh_token
+
     validates :resource_owner_id, :application, :expires_in, :token, presence: true
 
     class << self
