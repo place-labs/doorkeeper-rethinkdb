@@ -12,7 +12,7 @@ module Doorkeeper
     end
 
     def scopes_string
-      self[:scopes]
+      self._read_attribute(:scopes)
     end
 
     def includes_scope?(*required_scopes)

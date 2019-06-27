@@ -3,6 +3,7 @@ module Doorkeeper
     module Rethinkdb
       def self.initialize_models!
         require 'support/orm/rethinkdb/timestamps'
+        require 'support/orm/rethinkdb/scopes'
         require 'support/orm/rethinkdb/access_grant'
         require 'support/orm/rethinkdb/access_token'
         require 'support/orm/rethinkdb/application'
