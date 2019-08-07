@@ -17,7 +17,8 @@ module Doorkeeper
 
     field :resource_owner_id,       type: String, index: true
     field :token,                   type: String, uniq: true, index: true
-    field :refresh_token,           type: String, uniq: true, index: true
+    field :refresh_token,           type: String, unique_or_empty: true, index: true
+
     field :scopes,                  type: String
     field :previous_refresh_token,  type: String, default: ->{ '' }
     field :expires_in,              type: Integer
@@ -258,6 +259,13 @@ module Doorkeeper
       raise Errors::UnableToGenerateToken, "#{generator} does not respond to `.generate`."
     rescue NameError
       raise Errors::TokenGeneratorNotFound, "#{generator} not found"
+    end
+  end
+
+  # Skips validation if field is empty
+  class UniqueOrEmptyValidator < UniquenessValidator
+    def validate_each(doc, attr, value)
+      super if value
     end
   end
 end
