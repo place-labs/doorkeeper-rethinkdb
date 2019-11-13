@@ -3,6 +3,8 @@
 require File.expand_path("../access_grant", __FILE__)
 require File.expand_path("../access_token", __FILE__)
 
+# Required for Rails 6 support
+require "doorkeeper/orm/active_record/redirect_uri_validator"
 
 module Doorkeeper
   class Application
@@ -47,7 +49,7 @@ module Doorkeeper
     private
 
     validates :name, :secret, :uid, presence: true
-    validates :redirect_uri, redirect_uri: true
+    validates :redirect_uri, "doorkeeper/redirect_uri": true
     validates :confidential, inclusion: { in: [true, false] }
 
     before_validation :generate_uid, :generate_secret, on: :create
