@@ -3,6 +3,8 @@ module Doorkeeper
   class AccessToken
     include NoBrainer::Document
 
+    table_config name: 'doorkeeper_token'
+
     include OAuth::Helpers
     include Models::Expirable
     include Models::Revocable

@@ -3,6 +3,8 @@ module Doorkeeper
   class AccessGrant
     include NoBrainer::Document
 
+    table_config name: 'doorkeeper_grant'
+
     include OAuth::Helpers
     include Models::Expirable
     include Models::Revocable

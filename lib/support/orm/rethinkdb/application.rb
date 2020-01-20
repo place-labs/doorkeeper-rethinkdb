@@ -10,6 +10,8 @@ module Doorkeeper
   class Application
     include NoBrainer::Document
 
+    table_config name: 'doorkeeper_app'
+
     include OAuth::Helpers
     include Models::Scopes
 
