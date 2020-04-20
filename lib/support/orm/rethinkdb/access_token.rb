@@ -19,7 +19,7 @@ module Doorkeeper
 
     field :resource_owner_id,       type: String, index: true
     field :token,                   type: String, uniq: true, index: true
-    field :refresh_token,           type: String, uniq: true, index: true
+    field :refresh_token,           type: String, index: true
 
     field :scopes,                  type: String
     field :previous_refresh_token,  type: String, default: ->{ '' }
@@ -227,6 +227,14 @@ module Doorkeeper
 
     before_validation :generate_token, on: :create
     before_validation :generate_refresh_token, on: :create, if: :use_refresh_token?
+
+    validate :refresh_token_unique
+
+    def refresh_token_unique
+      if refresh_token.present? && where(refresh_token: refresh_token).count > 0
+          errors.add(:refresh_token, "must be unique")
+      end
+    end
 
     # Generates refresh token with UniqueToken generator.
     #
