@@ -231,7 +231,7 @@ module Doorkeeper
     validate :refresh_token_unique
 
     def refresh_token_unique
-      if refresh_token.present? && where(refresh_token: refresh_token).count > 0
+      if refresh_token.present? && ::Doorkeeper::AccessToken.where(refresh_token: refresh_token).count > 0
           errors.add(:refresh_token, "must be unique")
       end
     end
