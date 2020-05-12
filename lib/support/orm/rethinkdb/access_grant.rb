@@ -23,6 +23,7 @@ module Doorkeeper
 
     field :expires_in,        type: Integer
     field :ttl,               type: Integer
+    field :revoked_at,        type: Time
     
     # PKCE support
     field :code_challenge,        type: String
