@@ -10,6 +10,7 @@ module Doorkeeper
     include Models::Revocable
     include Models::Accessible
     include Models::Scopes
+    include Models::SecretStorable
 
     include ::Doorkeeper::Rethinkdb::Timestamps
 
@@ -34,6 +35,11 @@ module Doorkeeper
     class << self
       def refresh_token_revoked_on_use?
         true
+      end
+      
+      def find_by_plaintext_token(attr, token)
+        # We are not implementing the fallback strategy
+        where(attr => secret_strategy.transform_secret(token.to_s)).first
       end
 
       # Returns an instance of the Doorkeeper::AccessToken with
