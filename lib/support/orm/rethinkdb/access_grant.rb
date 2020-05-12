@@ -41,6 +41,10 @@ module Doorkeeper
         padded_result = Base64.urlsafe_encode64(Digest::SHA256.digest(code_verifier))
         padded_result.split("=")[0] # Remove any trailing '='
       end
+      
+      def pkce_supported?
+        true
+      end
     end
 
     validates :resource_owner_id, :application, :token, :expires_in, :redirect_uri, presence: true
