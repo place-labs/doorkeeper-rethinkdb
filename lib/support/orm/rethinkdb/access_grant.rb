@@ -45,6 +45,26 @@ module Doorkeeper
       def pkce_supported?
         true
       end
+      
+      ##
+      # Determines the secret storing transformer
+      # Unless configured otherwise, uses the plain secret strategy
+      #
+      # @return [Doorkeeper::SecretStoring::Base]
+      #
+      def secret_strategy
+        ::Doorkeeper.config.token_secret_strategy
+      end
+
+      ##
+      # Determine the fallback storing strategy
+      # Unless configured, there will be no fallback
+      #
+      # @return [Doorkeeper::SecretStoring::Base]
+      #
+      def fallback_secret_strategy
+        ::Doorkeeper.config.token_secret_fallback_strategy
+      end
     end
 
     validates :resource_owner_id, :application, :token, :expires_in, :redirect_uri, presence: true
