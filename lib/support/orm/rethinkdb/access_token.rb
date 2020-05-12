@@ -292,6 +292,11 @@ module Doorkeeper
       self.previous_refresh_token = ''
       self.save!
     end
+    
+    def revoke(clock = Time)
+      self.revoked_at = clock.now.utc
+      self.save!
+    end
 
     def transaction; yield; end
     def lock!; end
