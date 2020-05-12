@@ -176,6 +176,8 @@ module Doorkeeper
       # @return [Doorkeeper::AccessToken] existing record or a new one
       #
       def find_or_create_for(application:, resource_owner:, scopes:, **token_attributes)
+        resource_owner = resource_owner.try(:id) || resource_owner
+
         if Doorkeeper.config.reuse_access_token
           access_token = matching_token_for(application, resource_owner, scopes)
 
