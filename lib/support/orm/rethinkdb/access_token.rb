@@ -193,6 +193,16 @@ module Doorkeeper
         )
       end
       
+      def create_for(application:, resource_owner:, scopes:, **token_attributes)
+        token_attributes[:application_id] = application&.id
+        token_attributes[:scopes] = scopes.to_s
+        
+        resource_owner = resource_owner.try(:id) || resource_owner
+        token_attributes[:resource_owner_id] = resource_owner || application.try(:owner_id)
+
+        create!(**token_attributes)
+      end
+      
       ##
       # Determines the secret storing transformer
       # Unless configured otherwise, uses the plain secret strategy
