@@ -184,6 +184,23 @@ module Doorkeeper
           use_refresh_token: use_refresh_token
         )
       end
+      
+      ##
+      # Determines the secret storing transformer
+      # Unless configured otherwise, uses the plain secret strategy
+      #
+      # @return [Doorkeeper::SecretStoring::Base]
+      #
+      def secret_strategy
+        ::Doorkeeper.config.token_secret_strategy
+      end
+
+      ##
+      # Determine the fallback storing strategy
+      # Unless configured, there will be no fallback
+      def fallback_secret_strategy
+        ::Doorkeeper.config.token_secret_fallback_strategy
+      end
     end
 
     # Access Token type: Bearer.
