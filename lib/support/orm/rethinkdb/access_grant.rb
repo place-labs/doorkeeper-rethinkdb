@@ -64,7 +64,7 @@ module Doorkeeper
     # @return [String] token value
     #
     def generate_token
-      self.ttl = self.created_at + self.expires_in + 30
+      self.ttl = self.created_at + self.expires_in + 30 if self.expires_in
       self.token = UniqueToken.generate if self.token.blank?
     end
   end
