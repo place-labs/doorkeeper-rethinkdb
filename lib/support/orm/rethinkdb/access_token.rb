@@ -61,6 +61,21 @@ module Doorkeeper
       def by_refresh_token(refresh_token)
         where(refresh_token: refresh_token).first
       end
+      
+      # Returns an instance of the Doorkeeper::AccessToken
+      # found by previous refresh token. Keep in mind that value
+      # of the previous_refresh_token isn't encrypted using
+      # secrets strategy.
+      #
+      # @param previous_refresh_token [#to_s]
+      #   previous refresh token value (any object that responds to `#to_s`)
+      #
+      # @return [Doorkeeper::AccessToken, nil] AccessToken object or nil
+      #   if there is no record with such refresh token
+      #
+      def by_previous_refresh_token(previous_refresh_token)
+        where(previous_refresh_token: previous_refresh_token).first
+      end
 
       # Revokes AccessToken records that have not been revoked and associated
       # with the specific Application and Resource Owner.
@@ -219,6 +234,39 @@ module Doorkeeper
     def acceptable?(scopes)
       accessible? && includes_scope?(*scopes)
     end
+    
+    # We keep a volatile copy of the raw refresh token for initial communication
+    # The stored refresh_token may be mapped and not available in cleartext.
+    def plaintext_refresh_token
+      if secret_strategy.allows_restoring_secrets?
+        secret_strategy.restore_secret(self, :refresh_token)
+      else
+        @raw_refresh_token
+      end
+    end
+
+    # We keep a volatile copy of the raw token for initial communication
+    # The stored refresh_token may be mapped and not available in cleartext.
+    #
+    # Some strategies allow restoring stored secrets (e.g. symmetric encryption)
+    # while hashing strategies do not, so you cannot rely on this value
+    # returning a present value for persisted tokens.
+    def plaintext_token
+      if secret_strategy.allows_restoring_secrets?
+        secret_strategy.restore_secret(self, :token)
+      else
+        @raw_token
+      end
+    end
+    
+    # Revokes token with `:refresh_token` equal to `:previous_refresh_token`
+    # and clears `:previous_refresh_token` attribute.
+    #
+    def revoke_previous_refresh_token!
+      return unless self.class.refresh_token_revoked_on_use?
+      self.previous_refresh_token = ''
+      self.save!
+    end
 
     def transaction; yield; end
     def lock!; end
@@ -242,7 +290,8 @@ module Doorkeeper
     #
     def generate_refresh_token
       if self.refresh_token.blank?
-        write_attribute :refresh_token, UniqueToken.generate
+        @raw_refresh_token = UniqueToken.generate
+        secret_strategy.store_secret(self, :refresh_token, @raw_refresh_token)
       end
     end
 
@@ -258,13 +307,15 @@ module Doorkeeper
       end
 
       generator = Doorkeeper.configuration.access_token_generator.constantize
-      self.token = generator.generate(
+      @raw_token = generator.generate(
         resource_owner_id: resource_owner_id,
         scopes: scopes,
         application: application,
         expires_in: expires_in,
         created_at: created_at
       )
+      secret_strategy.store_secret(self, :token, @raw_token)
+      @raw_token
     rescue NoMethodError
       raise Errors::UnableToGenerateToken, "#{generator} does not respond to `.generate`."
     rescue NameError
