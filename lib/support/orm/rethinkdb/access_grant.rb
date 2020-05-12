@@ -10,6 +10,7 @@ module Doorkeeper
     include Models::Revocable
     include Models::Accessible
     include Models::Scopes
+    include Models::SecretStorable
 
     include Timestamps
 
@@ -30,6 +31,11 @@ module Doorkeeper
     class << self
       def by_token(token)
         where(token: token).first
+      end
+      
+      def find_by_plaintext_token(attr, token)
+        # We are not implementing the fallback strategy
+        where(attr => secret_strategy.transform_secret(token.to_s)).first
       end
       
       # @param code_verifier [#to_s] a one time use value (any object that responds to `#to_s`)
