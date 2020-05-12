@@ -30,7 +30,7 @@ module Doorkeeper
 
     class << self
       def by_token(token)
-        where(token: token).first
+        find_by_plaintext_token(:token, token)
       end
       
       def find_by_plaintext_token(attr, token)
