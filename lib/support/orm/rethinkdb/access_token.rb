@@ -27,6 +27,7 @@ module Doorkeeper
     field :previous_refresh_token,  type: String, default: ->{ '' }
     field :expires_in,              type: Integer
     field :ttl,                     type: Integer
+    field :revoked_at,              type: Time
 
     alias :plaintext_token :token
     alias :plaintext_refresh_token :refresh_token
