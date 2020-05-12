@@ -53,7 +53,7 @@ module Doorkeeper
       #   if there is no record with such token
       #
       def by_token(token)
-        where(token: token).first
+        find_by_plaintext_token(:token, token)
       end
 
       # Returns an instance of the Doorkeeper::AccessToken
@@ -66,7 +66,7 @@ module Doorkeeper
       #   if there is no record with such refresh token
       #
       def by_refresh_token(refresh_token)
-        where(refresh_token: refresh_token).first
+        find_by_plaintext_token(:refresh_token, refresh_token)
       end
       
       # Returns an instance of the Doorkeeper::AccessToken
