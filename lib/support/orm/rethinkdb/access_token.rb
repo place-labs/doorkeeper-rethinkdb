@@ -7,6 +7,7 @@ module Doorkeeper
 
     include OAuth::Helpers
     include Models::Expirable
+    include Models::Reusable
     include Models::Revocable
     include Models::Accessible
     include Models::Scopes
@@ -174,20 +175,18 @@ module Doorkeeper
       #
       # @return [Doorkeeper::AccessToken] existing record or a new one
       #
-      def find_or_create_for(application, resource_owner_id, scopes, expires_in, use_refresh_token)
-        if Doorkeeper.configuration.reuse_access_token
-          access_token = matching_token_for(application, resource_owner_id, scopes)
-          if access_token && !access_token.expired?
-            return access_token
-          end
+      def find_or_create_for(application:, resource_owner:, scopes:, **token_attributes)
+        if Doorkeeper.config.reuse_access_token
+          access_token = matching_token_for(application, resource_owner, scopes)
+
+          return access_token if access_token&.reusable?
         end
 
         create!(
           application_id:    application.try(:id),
-          resource_owner_id: resource_owner_id || application.try(:owner_id),
+          resource_owner_id: resource_owner || application.try(:owner_id),
           scopes:            scopes.to_s,
-          expires_in:        expires_in,
-          use_refresh_token: use_refresh_token
+          **token_attributes,
         )
       end
       
