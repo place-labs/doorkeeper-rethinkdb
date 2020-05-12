@@ -97,6 +97,11 @@ module Doorkeeper
         @raw_token
       end
     end
+    
+    def revoke(clock = Time)
+      self.revoked_at = clock.now.utc
+      self.save!
+    end
 
     private
 
