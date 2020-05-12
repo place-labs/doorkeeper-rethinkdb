@@ -56,6 +56,20 @@ module Doorkeeper
     def uses_pkce?
       self.code_challenge.present?
     end
+    
+    # We keep a volatile copy of the raw token for initial communication
+    # The stored refresh_token may be mapped and not available in cleartext.
+    #
+    # Some strategies allow restoring stored secrets (e.g. symmetric encryption)
+    # while hashing strategies do not, so you cannot rely on this value
+    # returning a present value for persisted tokens.
+    def plaintext_token
+      if secret_strategy.allows_restoring_secrets?
+        secret_strategy.restore_secret(self, :token)
+      else
+        @raw_token
+      end
+    end
 
     private
 
@@ -65,7 +79,10 @@ module Doorkeeper
     #
     def generate_token
       self.ttl = self.created_at + self.expires_in + 30 if self.created_at && self.expires_in
-      self.token = UniqueToken.generate if self.token.blank?
+      if self.token.blank?
+        @raw_token = Doorkeeper::OAuth::Helpers::UniqueToken.generate
+        secret_strategy.store_secret(self, :token, @raw_token)
+      end
     end
   end
 end
