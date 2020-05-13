@@ -42,6 +42,15 @@ module Doorkeeper
       def by_uid_and_secret(uid, secret)
         where(uid: uid, secret: secret).first
       end
+      
+      def by_uid_and_secret(uid, secret)
+        app = by_uid(uid)
+        return unless app
+        return app if secret.blank? && !app.confidential?
+        return unless app.secret_matches?(secret)
+
+        app
+      end
 
       def authorized_for(resource_owner)
         AccessToken.find_by_resource_owner_id(resource_owner.id).collect(&:application)
@@ -50,6 +59,15 @@ module Doorkeeper
     
     def authorized_for_resource_owner?(resource_owner)
       Doorkeeper.configuration.authorize_resource_owner_for_client.call(self, resource_owner)
+    end
+    
+    def secret_matches?(input)
+      # return false if either is nil, since secure_compare depends on strings
+      # but Application secrets MAY be nil depending on confidentiality.
+      return false if input.nil? || secret.nil?
+
+      # When matching the secret by comparer function, all is well.
+      input == secret
     end
 
     private
