@@ -82,6 +82,7 @@ module Doorkeeper
       #   if there is no record with such refresh token
       #
       def by_previous_refresh_token(previous_refresh_token)
+        return nil unless previous_refresh_token.present?
         where(previous_refresh_token: previous_refresh_token).first
       end
 
