@@ -343,7 +343,7 @@ module Doorkeeper
       self.created_at ||= Time.now.utc
 
       if use_refresh_token?
-        self.ttl = self.created_at + 6.months
+        self.ttl = self.created_at + 1.months
       else
         self.ttl = self.created_at + self.expires_in + 30
       end
