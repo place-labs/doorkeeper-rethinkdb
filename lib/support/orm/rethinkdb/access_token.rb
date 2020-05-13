@@ -112,7 +112,8 @@ module Doorkeeper
       #   nil if nothing was found
       #
       def last_authorized_token_for(application_id, resource_owner_id)
-        result = where(application_id: application_id, resource_owner_id: resource_owner.id).last
+        resource_owner_id = resource_owner_id.try(:id) || resource_owner_id
+        result = where(application_id: application_id, resource_owner_id: resource_owner_id).last
         return nil unless result
         result[:revoked_at] ? nil : result
       end
