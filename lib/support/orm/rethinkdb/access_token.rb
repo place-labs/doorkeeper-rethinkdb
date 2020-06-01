@@ -29,6 +29,8 @@ module Doorkeeper
     field :ttl,                     type: Integer
     field :revoked_at,              type: Time
 
+    index :ttl
+
     alias :plaintext_token :token
     alias :plaintext_refresh_token :refresh_token
 
@@ -38,7 +40,7 @@ module Doorkeeper
       def refresh_token_revoked_on_use?
         true
       end
-      
+
       def find_by_plaintext_token(attr, token)
         # We are not implementing the fallback strategy
         where(attr => secret_strategy.transform_secret(token.to_s)).first
@@ -69,7 +71,7 @@ module Doorkeeper
       def by_refresh_token(refresh_token)
         find_by_plaintext_token(:refresh_token, refresh_token)
       end
-      
+
       # Returns an instance of the Doorkeeper::AccessToken
       # found by previous refresh token. Keep in mind that value
       # of the previous_refresh_token isn't encrypted using
@@ -194,17 +196,17 @@ module Doorkeeper
           **token_attributes,
         )
       end
-      
+
       def create_for(application:, resource_owner:, scopes:, **token_attributes)
         token_attributes[:application_id] = application&.id
         token_attributes[:scopes] = scopes.to_s
-        
+
         resource_owner = resource_owner.try(:id) || resource_owner
         token_attributes[:resource_owner_id] = resource_owner || application.try(:owner_id)
 
         create!(**token_attributes)
       end
-      
+
       ##
       # Determines the secret storing transformer
       # Unless configured otherwise, uses the plain secret strategy
@@ -271,7 +273,7 @@ module Doorkeeper
     def acceptable?(scopes)
       accessible? && includes_scope?(*scopes)
     end
-    
+
     # We keep a volatile copy of the raw refresh token for initial communication
     # The stored refresh_token may be mapped and not available in cleartext.
     def plaintext_refresh_token
@@ -295,7 +297,7 @@ module Doorkeeper
         @raw_token
       end
     end
-    
+
     # Revokes token with `:refresh_token` equal to `:previous_refresh_token`
     # and clears `:previous_refresh_token` attribute.
     #
@@ -304,7 +306,7 @@ module Doorkeeper
       self.previous_refresh_token = ''
       self.save!
     end
-    
+
     def revoke(clock = Time)
       self.revoked_at = clock.now.utc
       self.save!

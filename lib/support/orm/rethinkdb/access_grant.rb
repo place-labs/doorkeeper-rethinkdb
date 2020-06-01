@@ -24,21 +24,23 @@ module Doorkeeper
     field :expires_in,        type: Integer
     field :ttl,               type: Integer
     field :revoked_at,        type: Time
-    
+
     # PKCE support
     field :code_challenge,        type: String
     field :code_challenge_method, type: String
+
+    index :ttl
 
     class << self
       def by_token(token)
         find_by_plaintext_token(:token, token)
       end
-      
+
       def find_by_plaintext_token(attr, token)
         # We are not implementing the fallback strategy
         where(attr => secret_strategy.transform_secret(token.to_s)).first
       end
-      
+
       # @param code_verifier [#to_s] a one time use value (any object that responds to `#to_s`)
       #
       # @return [#to_s] An encoded code challenge based on the provided verifier
@@ -48,11 +50,11 @@ module Doorkeeper
         padded_result = Base64.urlsafe_encode64(Digest::SHA256.digest(code_verifier))
         padded_result.split("=")[0] # Remove any trailing '='
       end
-      
+
       def pkce_supported?
         true
       end
-      
+
       ##
       # Determines the secret storing transformer
       # Unless configured otherwise, uses the plain secret strategy
@@ -79,11 +81,11 @@ module Doorkeeper
 
     def transaction; yield; end
     def lock!; end
-    
+
     def uses_pkce?
       self.code_challenge.present?
     end
-    
+
     # We keep a volatile copy of the raw token for initial communication
     # The stored refresh_token may be mapped and not available in cleartext.
     #
@@ -97,7 +99,7 @@ module Doorkeeper
         @raw_token
       end
     end
-    
+
     def revoke(clock = Time)
       self.revoked_at = clock.now.utc
       self.save!
