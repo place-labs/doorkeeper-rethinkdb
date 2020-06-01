@@ -112,7 +112,7 @@ module Doorkeeper
     # @return [String] token value
     #
     def generate_token
-      self.ttl = self.created_at + self.expires_in + 30 if self.created_at && self.expires_in
+      self.ttl = (self.created_at + self.expires_in + 30).to_i if self.created_at && self.expires_in
       if self.token.blank?
         @raw_token = Doorkeeper::OAuth::Helpers::UniqueToken.generate
         secret_strategy.store_secret(self, :token, @raw_token)

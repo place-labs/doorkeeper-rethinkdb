@@ -345,9 +345,9 @@ module Doorkeeper
       self.created_at ||= Time.now.utc
 
       if use_refresh_token?
-        self.ttl = self.created_at + 1.months
+        self.ttl = (self.created_at + 1.months).to_i
       else
-        self.ttl = self.created_at + self.expires_in + 30
+        self.ttl = (self.created_at + self.expires_in + 30).to_i
       end
 
       generator = Doorkeeper.configuration.access_token_generator.constantize
