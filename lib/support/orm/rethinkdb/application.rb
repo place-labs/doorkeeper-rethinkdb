@@ -15,7 +15,7 @@ module Doorkeeper
     include OAuth::Helpers
     include Models::Scopes
 
-    field :name, type: String
+    field :name, type: String, uniq: true, index: true
     field :uid, type: String, uniq: true, index: true
     field :secret, type: String
     field :scopes, type: String
