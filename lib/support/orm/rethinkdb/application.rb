@@ -19,7 +19,7 @@ module Doorkeeper
     field :uid, type: String, uniq: true, index: true
     field :secret, type: String
     field :scopes, type: String
-    field :redirect_uri, type: String
+    field :redirect_uri, type: String, uniq: true, index: true
 
     field :skip_authorization, type: Boolean, default: false
     field :confidential, type: Boolean, default: false
@@ -42,7 +42,7 @@ module Doorkeeper
       def by_uid_and_secret(uid, secret)
         where(uid: uid, secret: secret).first
       end
-      
+
       def by_uid_and_secret(uid, secret)
         app = by_uid(uid)
         return unless app
@@ -56,11 +56,11 @@ module Doorkeeper
         AccessToken.find_by_resource_owner_id(resource_owner.id).collect(&:application)
       end
     end
-    
+
     def authorized_for_resource_owner?(resource_owner)
       Doorkeeper.configuration.authorize_resource_owner_for_client.call(self, resource_owner)
     end
-    
+
     def secret_matches?(input)
       # return false if either is nil, since secure_compare depends on strings
       # but Application secrets MAY be nil depending on confidentiality.
