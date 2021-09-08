@@ -41,11 +41,12 @@ module Doorkeeper
     end
 
     def revoked_at
-      Time.at(self.revoked_time)
+      time = self.revoked_time
+      Time.at(time) if time
     end
 
     def revoked_at=(time)
-      self.revoked_time = time.to_i
+      self.revoked_time = time ? time.to_i : nil
     end
 
     class << self
