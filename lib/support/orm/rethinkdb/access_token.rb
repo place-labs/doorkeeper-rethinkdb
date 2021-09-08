@@ -27,7 +27,7 @@ module Doorkeeper
     field :previous_refresh_token,  type: String, default: ->{ '' }
     field :expires_in,              type: Integer
     field :ttl,                     type: Integer
-    field :revoked_at,              type: Time
+    field :revoked_time,            type: Integer
 
     index :ttl
 
@@ -38,6 +38,14 @@ module Doorkeeper
 
     def application_id?
       !!self.application_id
+    end
+
+    def revoked_at
+      Time.at(self.revoked_time)
+    end
+
+    def revoked_at=(time)
+      self.revoked_time = time.to_i
     end
 
     class << self
