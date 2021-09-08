@@ -36,6 +36,10 @@ module Doorkeeper
 
     validates :resource_owner_id, :application, :expires_in, :token, presence: true
 
+    def application_id?
+      !!self.application_id
+    end
+
     class << self
       def refresh_token_revoked_on_use?
         true

@@ -31,6 +31,10 @@ module Doorkeeper
       Doorkeeper.configuration.confirm_application_owner?
     end
 
+    def confidential?
+      self.confidential
+    end
+
     has_many :access_grants, dependent: :destroy, class_name: 'Doorkeeper::AccessGrant'
     has_many :access_tokens, dependent: :destroy, class_name: 'Doorkeeper::AccessToken'
 
