@@ -81,7 +81,7 @@ module Doorkeeper
 
     # Lets make sure these keys are not clogging up the database forever
     def save(**options)
-      options[:ttl] = self.created_at + self.expires_in + 30
+      self.ttl = self.created_at + self.expires_in + 30
       super(**options)
     end
 
@@ -108,6 +108,7 @@ module Doorkeeper
 
     def revoke(clock = Time)
       self.revoked_at = clock.now.utc
+      self.ttl = self.revoked_at + 60
       self.save!
     end
 
