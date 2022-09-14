@@ -81,7 +81,7 @@ module Doorkeeper
 
     # Lets make sure these keys are not clogging up the database forever
     def save(**options)
-      self.ttl = self.created_at + self.expires_in + 30
+      self.ttl = self.created_at.to_i + self.expires_in + 30
       super(**options)
     end
 
@@ -108,7 +108,7 @@ module Doorkeeper
 
     def revoke(clock = Time)
       self.revoked_at = clock.now.utc
-      self.ttl = self.revoked_at + 60
+      self.ttl = self.revoked_at.to_i + 60
       self.save!
     end
 
@@ -119,7 +119,7 @@ module Doorkeeper
     # @return [String] token value
     #
     def generate_token
-      self.ttl = (self.created_at + self.expires_in + 30).to_i if self.created_at && self.expires_in
+      self.ttl = Time.now.to_i + self.expires_in + 30 if self.expires_in
       if self.token.blank?
         @raw_token = Doorkeeper::OAuth::Helpers::UniqueToken.generate
         secret_strategy.store_secret(self, :token, @raw_token)
