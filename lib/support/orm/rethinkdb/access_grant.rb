@@ -79,6 +79,12 @@ module Doorkeeper
     validates :resource_owner_id, :application, :token, :expires_in, :redirect_uri, presence: true
     before_validation :generate_token, on: :create
 
+    # Lets make sure these keys are not clogging up the database forever
+    def save(**options)
+      options[:ttl] = self.created_at + self.expires_in + 30
+      super(**options)
+    end
+
     def transaction; yield; end
     def lock!; end
 
